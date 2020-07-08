@@ -1,0 +1,21 @@
+# Objective: Read and analyze CSlog file
+
+# Require libraries
+#install.packages("RSQLite")
+library(RSQLite)
+library(tidyverse)
+
+# CONNECT to SQLITE3 database (CSlog file) in working directory
+conn <- dbConnect(SQLite(),"data.sqlite")
+
+# Create character vector of table names in sqlite3 file
+tableList <- dbListTables(conn)
+tableList <- tables[tables != "sqlite_sequence"]
+
+# Read data from sqlite3 file and add into named list using "tableList"
+dataframe <- map(tableList, ~{
+  dbGetQuery(conn=conn, statement=paste("SELECT * FROM '", .x, "'", sep=""))
+})
+names(dataframe) <- tableList
+
+View(dataframe)
